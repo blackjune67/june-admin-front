@@ -13,7 +13,7 @@ export const useLoginMutation = () => {
   return useMutation<AuthTokens, Error, LoginMutationVariables>({
     mutationFn: ({ email, password }) => login({ email, password }),
     onSuccess: (tokens, variables) => {
-      setAuth(tokens, variables.rememberMe);
+      setAuth(tokens, variables.rememberMe, variables.email);
     },
   });
 };

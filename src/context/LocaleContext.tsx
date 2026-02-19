@@ -32,9 +32,13 @@ const getInitialLocale = (): Locale => {
     return DEFAULT_LOCALE;
   }
 
-  const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  if (storedLocale && isLocale(storedLocale)) {
-    return storedLocale;
+  try {
+    const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (storedLocale && isLocale(storedLocale)) {
+      return storedLocale;
+    }
+  } catch {
+    // Incognito / Private Browsing 등에서 실패해도 무시
   }
 
   const browserLocale = window.navigator.language.toLowerCase();
@@ -48,13 +52,27 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     setLocaleState(next);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+      try {
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+      } catch {
+        // Incognito / Private Browsing 등에서 실패해도 무시
+      }
     }
   }, []);
 
   const toggleLocale = useCallback(() => {
-    setLocale(locale === "ko" ? "en" : "ko");
-  }, [locale, setLocale]);
+    setLocaleState((prev) => {
+      const next = prev === "ko" ? "en" : "ko";
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+        } catch {
+          // Incognito / Private Browsing 등에서 실패해도 무시
+        }
+      }
+      return next;
+    });
+  }, []);
 
   const t = useCallback(
     (key: TranslationKey, variables?: TranslationVariables) =>

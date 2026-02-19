@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { ChevronDownIcon, HorizontaLDots } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
 import {
   mainNavItems,
   otherNavItems,
+  systemNavItems,
   type SidebarItem,
 } from "./sidebarConfig.tsx";
 import { useLocale } from "../context/LocaleContext";
@@ -16,7 +16,7 @@ const AppSidebar: React.FC = () => {
   const { t } = useLocale();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: "main" | "others";
+    type: "main" | "others" | "system";
     index: number;
   } | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
@@ -30,33 +30,24 @@ const AppSidebar: React.FC = () => {
   );
 
   useEffect(() => {
-    let submenuMatched = false;
+    const sections = [
+      { type: "main" as const, items: mainNavItems },
+      { type: "others" as const, items: otherNavItems },
+      { type: "system" as const, items: systemNavItems },
+    ];
 
-    const sectionMap = {
-      main: mainNavItems,
-      others: otherNavItems,
-    } as const;
-
-    (Object.entries(sectionMap) as Array<["main" | "others", SidebarItem[]]>).forEach(
-      ([menuType, items]) => {
-        items.forEach((nav, index) => {
-          nav.subItems?.forEach((subItem) => {
-            if (isActive(subItem.path)) {
-              setOpenSubmenu({
-                type: menuType,
-                index,
-              });
-              submenuMatched = true;
-            }
-          });
-        });
-      },
-    );
-
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
+    for (const { type, items } of sections) {
+      for (let index = 0; index < items.length; index++) {
+        const subItems = items[index].subItems;
+        if (subItems?.some((subItem) => location.pathname === subItem.path)) {
+          setOpenSubmenu({ type, index });
+          return;
+        }
+      }
     }
-  }, [isActive]);
+
+    setOpenSubmenu(null);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (openSubmenu !== null) {
@@ -70,7 +61,7 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
-  const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
+  const handleSubmenuToggle = (index: number, menuType: "main" | "others" | "system") => {
     setOpenSubmenu((prevOpenSubmenu) => {
       if (
         prevOpenSubmenu &&
@@ -83,7 +74,7 @@ const AppSidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (items: SidebarItem[], menuType: "main" | "others") => (
+  const renderMenuItems = (items: SidebarItem[], menuType: "main" | "others" | "system") => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => (
         <li key={nav.labelKey}>
@@ -279,9 +270,24 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(otherNavItems, "others")}
             </div>
+            <div>
+              <h2
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                  !isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "justify-start"
+                }`}
+              >
+                {isExpanded || isHovered || isMobileOpen ? (
+                  t("sidebar.section.system")
+                ) : (
+                  <HorizontaLDots />
+                )}
+              </h2>
+              {renderMenuItems(systemNavItems, "system")}
+            </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

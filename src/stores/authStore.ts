@@ -7,6 +7,7 @@ const AUTH_STORAGE_KEY = "june-admin.auth";
 type StoredAuthState = {
   tokens: AuthTokens;
   rememberMe: boolean;
+  userEmail: string | null;
 };
 
 export interface AuthStore {
@@ -15,7 +16,8 @@ export interface AuthStore {
   tokenType: string;
   rememberMe: boolean;
   isAuthenticated: boolean;
-  setAuth: (tokens: AuthTokens, rememberMe: boolean) => void;
+  userEmail: string | null;
+  setAuth: (tokens: AuthTokens, rememberMe: boolean, userEmail: string) => void;
   updateAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
 }
@@ -47,6 +49,7 @@ const readInitialState = (): {
   refreshToken: string | null;
   tokenType: string;
   rememberMe: boolean;
+  userEmail: string | null;
 } => {
   if (!isBrowser) {
     return {
@@ -54,6 +57,7 @@ const readInitialState = (): {
       refreshToken: null,
       tokenType: "Bearer",
       rememberMe: false,
+      userEmail: null,
     };
   }
 
@@ -66,6 +70,7 @@ const readInitialState = (): {
       refreshToken: localStored.tokens.refreshToken,
       tokenType: localStored.tokens.tokenType,
       rememberMe: localStored.rememberMe,
+      userEmail: localStored.userEmail ?? null,
     };
   }
 
@@ -78,6 +83,7 @@ const readInitialState = (): {
       refreshToken: sessionStored.tokens.refreshToken,
       tokenType: sessionStored.tokens.tokenType,
       rememberMe: sessionStored.rememberMe,
+      userEmail: sessionStored.userEmail ?? null,
     };
   }
 
@@ -86,10 +92,11 @@ const readInitialState = (): {
     refreshToken: null,
     tokenType: "Bearer",
     rememberMe: false,
+    userEmail: null,
   };
 };
 
-const persistAuth = (tokens: AuthTokens, rememberMe: boolean) => {
+const persistAuth = (tokens: AuthTokens, rememberMe: boolean, userEmail: string) => {
   if (!isBrowser) {
     return;
   }
@@ -97,6 +104,7 @@ const persistAuth = (tokens: AuthTokens, rememberMe: boolean) => {
   const payload: StoredAuthState = {
     tokens,
     rememberMe,
+    userEmail,
   };
 
   window.localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -124,14 +132,16 @@ export const useAuthStore = create<AuthStore>()(
     tokenType: initialState.tokenType,
     rememberMe: initialState.rememberMe,
     isAuthenticated: Boolean(initialState.accessToken),
-    setAuth: (tokens, rememberMe) => {
-      persistAuth(tokens, rememberMe);
+    userEmail: initialState.userEmail,
+    setAuth: (tokens, rememberMe, userEmail) => {
+      persistAuth(tokens, rememberMe, userEmail);
       set((state) => {
         state.accessToken = tokens.accessToken;
         state.refreshToken = tokens.refreshToken;
         state.tokenType = tokens.tokenType;
         state.rememberMe = rememberMe;
         state.isAuthenticated = true;
+        state.userEmail = userEmail;
       });
     },
     updateAccessToken: (accessToken) => {
@@ -162,6 +172,7 @@ export const useAuthStore = create<AuthStore>()(
         state.tokenType = "Bearer";
         state.rememberMe = false;
         state.isAuthenticated = false;
+        state.userEmail = null;
       });
     },
   })),

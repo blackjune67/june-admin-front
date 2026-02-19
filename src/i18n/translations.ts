@@ -94,6 +94,12 @@ const en = {
   "sidebar.widget.description":
     "Leading Tailwind CSS Admin Template with 400+ UI components and pages.",
   "sidebar.widget.cta": "Purchase Plan",
+  "sidebar.automation": "Automation",
+  "sidebar.usageComparison": "Usage Comparison",
+  "sidebar.section.system": "System",
+  "sidebar.systemMenu": "System",
+  "sidebar.rolePermissions": "Role-Permission Management",
+  "sidebar.userRoles": "User-Role Management",
 } as const;
 
 const ko: Record<keyof typeof en, string> = {
@@ -186,6 +192,12 @@ const ko: Record<keyof typeof en, string> = {
   "sidebar.widget.description":
     "400개 이상의 UI 컴포넌트와 페이지를 제공하는 대표 Tailwind CSS 관리자 템플릿입니다.",
   "sidebar.widget.cta": "플랜 구매",
+  "sidebar.automation": "자동화",
+  "sidebar.usageComparison": "재고 사용량 비교",
+  "sidebar.section.system": "시스템",
+  "sidebar.systemMenu": "시스템메뉴",
+  "sidebar.rolePermissions": "역할-권한 관리",
+  "sidebar.userRoles": "사용자-역할 관리",
 };
 
 export const translations = {

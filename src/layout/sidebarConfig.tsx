@@ -4,6 +4,7 @@ import {
   CalenderIcon,
   GridIcon,
   ListIcon,
+  LockIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
@@ -32,6 +33,14 @@ export const mainNavItems: SidebarItem[] = [
     subItems: [{ labelKey: "sidebar.ecommerce", path: "/" }],
   },
   {
+    icon: <TableIcon />,
+    labelKey: "sidebar.automation",
+    subItems: [{ labelKey: "sidebar.usageComparison", path: "/usage-comparison" }],
+  },
+];
+
+export const otherNavItems: SidebarItem[] = [
+  {
     icon: <CalenderIcon />,
     labelKey: "sidebar.calendar",
     path: "/calendar",
@@ -59,9 +68,6 @@ export const mainNavItems: SidebarItem[] = [
       { labelKey: "sidebar.error404", path: "/error-404" },
     ],
   },
-];
-
-export const otherNavItems: SidebarItem[] = [
   {
     icon: <PieChartIcon />,
     labelKey: "sidebar.charts",
@@ -88,6 +94,17 @@ export const otherNavItems: SidebarItem[] = [
     subItems: [
       { labelKey: "sidebar.signIn", path: "/signin" },
       { labelKey: "sidebar.signUp", path: "/signup" },
+    ],
+  },
+];
+
+export const systemNavItems: SidebarItem[] = [
+  {
+    icon: <LockIcon />,
+    labelKey: "sidebar.systemMenu",
+    subItems: [
+      { labelKey: "sidebar.rolePermissions", path: "/system/role-permissions" },
+      { labelKey: "sidebar.userRoles", path: "/system/user-roles" },
     ],
   },
 ];
